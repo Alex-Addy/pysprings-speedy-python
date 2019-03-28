@@ -1,0 +1,9 @@
+[package]
+name = "disrupted_continuity"
+version = "0.1.0"
+authors = ["Alex Addy <alex.addy@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+image = "*"
+rand = "*"
