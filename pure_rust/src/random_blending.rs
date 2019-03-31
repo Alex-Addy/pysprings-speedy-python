@@ -9,15 +9,16 @@ fn gen_matrix(size: usize) -> Vec<Vec<u8>> {
     let distribution = Uniform::new_inclusive(0, 255);
     let mut src = distribution.sample_iter(&mut rng);
     let mut mat = vec![vec![0; size]; size];
-    for i in 0..size {
-        for j in 0..size {
-            mat[i][j] = src.next().unwrap();
+    for row in mat.iter_mut() {
+        for item in row.iter_mut() {
+            *item = src.next().unwrap();
         }
     }
 
     mat
 }
 
+/// Randomly pick an index from PROBABILITIES based upon matrix weights.
 fn pick_from_probability() -> usize {
     let mut rng = thread_rng();
     let total: usize = PROBABILITIES.iter().sum();
@@ -32,8 +33,8 @@ fn pick_from_probability() -> usize {
     choice_idx
 }
 
+/// Convert the output from pick_from_probability into a relative index value.
 fn convert_pick_to_rel_idx(pick: usize) -> (isize, isize) {
-    // TODO make this general
     match pick {
         0 => (-1, -1),
         1 => (-1, 0),
@@ -48,7 +49,10 @@ fn convert_pick_to_rel_idx(pick: usize) -> (isize, isize) {
     }
 }
 
-fn get_idx(i: usize, j: usize, size: usize) -> (usize, usize) {
+/// Pick an in bounds index to blend with.
+///
+/// Uses probability matrix PROBABILITIES to make pick.
+fn pick_blend_indexes(i: usize, j: usize, size: usize) -> (usize, usize) {
     let i = i as isize;
     let j = j as isize;
     let size = size as isize;
@@ -70,11 +74,11 @@ fn get_idx(i: usize, j: usize, size: usize) -> (usize, usize) {
 /// Randomly blend pixels from placing results into into
 ///
 /// assumes from and into are the same size and are square
-fn blend_into(size: usize, from: &Vec<Vec<u8>>, into: &mut Vec<Vec<u8>>) {
+fn blend_into(size: usize, from: &[Vec<u8>], into: &mut Vec<Vec<u8>>) {
     for i in 0..from.len() {
         for j in 0..from.len() {
             let (blend_i, blend_j) = get_idx(i, j, size);
-            into[i][j] = ((from[i][j] as u16 + from[blend_i][blend_j] as u16) / 2) as u8;
+            into[i][j] = ((u16::from(from[i][j]) + u16::from(from[blend_i][blend_j])) / 2) as u8;
         }
     }
 }
