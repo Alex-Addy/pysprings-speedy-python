@@ -1,4 +1,4 @@
-use image::{ImageBuffer, Luma, Rgb};
+use image::{ImageBuffer, Luma};
 
 mod random_blending;
 
