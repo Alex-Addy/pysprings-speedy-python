@@ -3,12 +3,19 @@ use image::{ImageBuffer, Luma};
 mod random_blending;
 
 const SIZE: usize = 128;
+const ITERATIONS: usize = 20;
 
 fn main() {
     let mut img = ImageBuffer::new(SIZE as u32, SIZE as u32);
-    let canvas = random_blending::random_blending(SIZE, 50);
+    let grayscale = match random_blending::random_blending(SIZE, ITERATIONS) {
+        Ok(grayscale) => grayscale,
+        Err(err) => {
+            println!("Error while blending: {}", err);
+            return;
+        },
+    };
     println!("Converting raw to image");
-    for (x, row) in canvas.into_iter().enumerate() {
+    for (x, row) in grayscale.into_iter().enumerate() {
         for (y, c) in row.into_iter().enumerate() {
             let pixel = Luma([c]);
             img.put_pixel(x as u32, y as u32, pixel);
