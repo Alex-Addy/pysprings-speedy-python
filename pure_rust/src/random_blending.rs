@@ -33,8 +33,8 @@ fn pick_from_probability() -> usize {
     choice_idx
 }
 
-/// Convert the output from pick_from_probability into a relative index value.
-fn convert_pick_to_rel_idx(pick: usize) -> (isize, isize) {
+/// Convert a single dimensional index to the equivalent in two dimensions.
+fn split_index(pick: usize) -> (isize, isize) {
     match pick {
         0 => (-1, -1),
         1 => (-1, 0),
@@ -58,7 +58,7 @@ fn pick_blend_indexes(i: usize, j: usize, size: usize) -> (usize, usize) {
     let size = size as isize;
 
     loop {
-        let (row_diff, col_diff) = convert_pick_to_rel_idx(pick_from_probability());
+        let (row_diff, col_diff) = split_index(pick_from_probability());
         // ensure row_diff is in range
         if row_diff + i >= size || row_diff + i < 0 {
             continue;
@@ -73,10 +73,10 @@ fn pick_blend_indexes(i: usize, j: usize, size: usize) -> (usize, usize) {
 
 /// Randomly blend pixels from placing results into into
 ///
-/// assumes from and into are the same size and are square
+/// Assumes from and into are the same size and are square
 fn blend_into(size: usize, from: &[Vec<u8>], into: &mut Vec<Vec<u8>>) {
-    for i in 0..from.len() {
-        for j in 0..from.len() {
+    for i in 0..size {
+        for j in 0..size {
             let (blend_i, blend_j) = pick_blend_indexes(i, j, size);
             into[i][j] = ((u16::from(from[i][j]) + u16::from(from[blend_i][blend_j])) / 2) as u8;
         }
@@ -84,17 +84,26 @@ fn blend_into(size: usize, from: &[Vec<u8>], into: &mut Vec<Vec<u8>>) {
 }
 
 /// Generate a new grayscale image via random blending
-pub fn random_blending(size: usize, iterations: usize) -> Vec<Vec<u8>> {
+///
+/// # Example
+///
+/// This will create a image that is 128x128 pixels with 20 iterations of
+/// blending.
+/// ```no-run
+/// let grayscale = random_blending(128, 20);
+/// ```
+pub fn random_blending(size: usize, iterations: usize) -> Result<Vec<Vec<u8>>, String> {
+    if iterations == 0 {
+        return Err("Cannot perform zero iterations.".to_string());
+    }
+    if size <= 1 {
+        return Err("Size of the image must be greater than 1 pixel".to_string());
+    }
+
+    // In order to make this efficient I will allocate only two arrays and then swap
+    // back and forth which is going to be used as the source and destination.
     let mut first = gen_matrix(size);
     let mut second = first.clone();
-    if iterations == 0 {
-        // Not sure why this would happen but handling it here makes later easier
-        return first;
-    }
-    if size == 0 || size == 1 {
-        // If the square size is 0 or 1 no amount of iterations will change the output
-        return first;
-    }
 
     let mut swapped = false;
 
@@ -109,10 +118,10 @@ pub fn random_blending(size: usize, iterations: usize) -> Vec<Vec<u8>> {
         println!("Completed iteration {}/{}", iter_num, iterations);
     }
 
-    // pick which matrix to return
+    // return the last matrix written to
     if swapped {
-        second
+        Ok(second)
     } else {
-        first
+        Ok(first)
     }
 }
