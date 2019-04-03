@@ -12,7 +12,7 @@ fn main() {
         Err(err) => {
             println!("Error while blending: {}", err);
             return;
-        },
+        }
     };
     println!("Converting raw to image");
     for (x, row) in grayscale.into_iter().enumerate() {
