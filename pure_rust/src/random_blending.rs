@@ -1,7 +1,14 @@
 use rand::distributions::Uniform;
 use rand::prelude::*;
 
-const PROBABILITIES: &[usize; 9] = &[1, 4, 5, 1, 0, 5, 1, 1, 1];
+/// This weighted matrix determines the likelihood of a specific relative index
+/// being chosen.
+#[cfg_attr(rustfmt, rustfmt_skip)]
+const PROBABILITIES: &[usize; 9] = &[
+    1, 8, 8, 
+    1, 0, 8,
+    1, 1, 1
+];
 
 /// Generate a square matrix filled with noise
 fn gen_matrix(size: usize) -> Vec<Vec<u8>> {
@@ -34,8 +41,22 @@ fn pick_from_probability() -> usize {
 }
 
 /// Convert a single dimensional index to the equivalent in two dimensions.
-fn split_index(pick: usize) -> (isize, isize) {
-    match pick {
+///
+/// `idx` - the one dimensional index to convert
+/// `row_len` - the length of each row in two dimensions
+///
+/// Assumes a x,y coordinate system where 0,0 is the center of the square.
+///
+/// # Example
+///
+/// ```
+/// let (x, y) = split_index(2);
+///
+/// assert_eq!(x, -1);
+/// assert_eq!(y, 1);
+/// ```
+fn split_index(idx: usize) -> (isize, isize) {
+    match idx {
         0 => (-1, -1),
         1 => (-1, 0),
         2 => (-1, 1),
@@ -123,5 +144,33 @@ pub fn random_blending(size: usize, iterations: usize) -> Result<Vec<Vec<u8>>, S
         Ok(second)
     } else {
         Ok(first)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    /// Test the output of split index for all possible 3-size values.
+    fn test_split_index_3() {
+        // This test isn't very useful right now, but if multiple PROBABILITIES matrices
+        // become supported it will be more useful.
+        for i in 0..8 {
+            let idxs = split_index(i);
+            let exp_idxs = match i {
+                0 => (-1, -1),
+                1 => (-1, 0),
+                2 => (-1, 1),
+                3 => (0, -1),
+                4 => (0, 0),
+                5 => (0, 1),
+                6 => (1, -1),
+                7 => (1, 0),
+                8 => (1, 1),
+                _ => unreachable!(),
+            };
+            assert_eq!(exp_idxs, idxs);
+        }
     }
 }
