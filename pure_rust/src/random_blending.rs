@@ -77,7 +77,7 @@ fn pick_blend_indexes(i: usize, j: usize, size: usize) -> (usize, usize) {
 fn blend_into(size: usize, from: &[Vec<u8>], into: &mut Vec<Vec<u8>>) {
     for i in 0..from.len() {
         for j in 0..from.len() {
-            let (blend_i, blend_j) = get_idx(i, j, size);
+            let (blend_i, blend_j) = pick_blend_indexes(i, j, size);
             into[i][j] = ((u16::from(from[i][j]) + u16::from(from[blend_i][blend_j])) / 2) as u8;
         }
     }
