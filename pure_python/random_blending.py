@@ -5,6 +5,8 @@ import random
 
 from typing import List, Tuple
 
+from PIL import Image
+
 #
 # Constants
 #
@@ -60,7 +62,7 @@ def blend_into(size: int, src: List[List[int]], dst: List[List[int]]) -> None:
     for i in range(0, size):
         for j in range(0, size):
             (blend_i, blend_j) = pick_blend_indexes(i, j, size)
-            dst[i][j] = src[i][j] + dst[blend_i][blend_j]
+            dst[i][j] = (src[i][j] + dst[blend_i][blend_j]) // 2
 
 def random_blending(size: int, iterations: int) -> List[List[int]]:
     if iterations <= 0:
@@ -93,7 +95,11 @@ def main():
         print("Error while blending: {}".format(exc))
         return
 
-    print("Done")
+    img = Image.new('L', (SIZE, SIZE))
+    for i in range(SIZE):
+        for j in range(SIZE):
+            img.putpixel((i, j), grayscale[i][j])
+    img.save("output.png")
 
 
 if __name__ == '__main__':
