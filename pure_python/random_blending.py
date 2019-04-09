@@ -2,6 +2,7 @@
 
 import copy
 import random
+import argparse
 
 from typing import List, Tuple
 
@@ -16,9 +17,6 @@ PROBABILITIES = [
     1, 0, 8,
     1, 1, 1,
 ]
-
-SIZE = 128
-ITERATIONS = 20
 
 #
 # Helper functions
@@ -89,15 +87,19 @@ def random_blending(size: int, iterations: int) -> List[List[int]]:
         return first
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('size', type=int, help="how big the image will be")
+    parser.add_argument('iterations', type=int, help='how many iterations to execute')
+    args = parser.parse_args()
     try:
-        grayscale = random_blending(SIZE, ITERATIONS)
+        grayscale = random_blending(args.size, args.iterations)
     except ValueError as exc:
         print("Error while blending: {}".format(exc))
         return
-
-    img = Image.new('L', (SIZE, SIZE))
-    for i in range(SIZE):
-        for j in range(SIZE):
+    
+    img = Image.new('L', (args.size, args.size))
+    for i in range(args.size):
+        for j in range(args.size):
             img.putpixel((i, j), grayscale[i][j])
     img.save("output.png")
 

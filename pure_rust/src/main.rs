@@ -1,13 +1,18 @@
 use image::{ImageBuffer, Luma};
+use clap::{Arg, App};
 
 mod random_blending;
 
-const SIZE: usize = 128;
-const ITERATIONS: usize = 20;
-
 fn main() {
-    let mut img = ImageBuffer::new(SIZE as u32, SIZE as u32);
-    let grayscale = match random_blending::random_blending(SIZE, ITERATIONS) {
+    let matches = App::new("random_blending")
+        .arg(Arg::with_name("size").required(true).help("size of image in pixels"))
+        .arg(Arg::with_name("iterations").required(true).help("number of iterations to run"))
+        .get_matches();
+    let size = matches.value_of("size").unwrap().parse().unwrap();
+    let iterations = matches.value_of("iterations").unwrap().parse().unwrap();
+
+    let mut img = ImageBuffer::new(size as u32, size as u32);
+    let grayscale = match random_blending::random_blending(size, iterations) {
         Ok(grayscale) => grayscale,
         Err(err) => {
             println!("Error while blending: {}", err);
