@@ -1,0 +1,13 @@
+[package]
+name = "random_blending"
+version = "0.1.0"
+authors = ["Alex Addy <alex.addy@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "random_blending_ffi"
+crate_type = ["dylib"]
+
+[dependencies]
+image = "*"
+rand = "*"
