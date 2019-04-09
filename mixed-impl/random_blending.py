@@ -1,10 +1,11 @@
+import os
 import sys
 import argparse
 
 from cffi import FFI
 
-DEBUG_PATH = "./target/debug/librandom_blending_ffi.so"
-RELEASE_PATH = "./target/release/librandom_blending_ffi.so"
+DEBUG_PATH = "target/debug/librandom_blending_ffi.so"
+RELEASE_PATH = "target/release/librandom_blending_ffi.so"
 
 ffi = FFI()
 ffi.cdef("""
@@ -22,6 +23,15 @@ probabilities = ffi.new('int[9]')
 for i in PROBABILITIES:
     probabilities[i] = ffi.cast("int", PROBABILITIES[i])
 
+def get_path(release: bool) -> str:
+    if release:
+        relative_path = RELEASE_PATH
+    else:
+        relative_path = DEBUG_PATH
+
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(file_dir, relative_path)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('size', type=int, help="how big the image will be")
@@ -29,10 +39,7 @@ def main():
     parser.add_argument('--release', help="use release .so", action='store_true')
     args = parser.parse_args()
 
-    if args.release:
-        C = ffi.dlopen(RELEASE_PATH)
-    else:
-        C = ffi.dlopen(DEBUG_PATH)
+    C = ffi.dlopen(get_path(args.release))
 
     out_path = ffi.new("char[]", "output.png".encode())
     ret = C.random_blending_c(args.size, args.iterations, PROBABILITIES, out_path)
