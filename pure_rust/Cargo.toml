@@ -1,5 +1,5 @@
 [package]
-name = "disrupted_continuity"
+name = "random_blending"
 version = "0.1.0"
 authors = ["Alex Addy <alex.addy@gmail.com>"]
 edition = "2018"
