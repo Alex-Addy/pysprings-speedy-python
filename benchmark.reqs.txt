@@ -1,0 +1,8 @@
+cffi==1.12.2
+Pillow==6.0.0
+sh==1.12.14
+
+# the following are depdencies of above, if you are having problems with the
+# install try commenting them out
+greenlet==0.4.13
+readline==6.2.4.1
