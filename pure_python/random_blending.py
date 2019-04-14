@@ -60,7 +60,7 @@ def blend_into(size: int, src: List[List[int]], dst: List[List[int]]) -> None:
     for i in range(0, size):
         for j in range(0, size):
             (blend_i, blend_j) = pick_blend_indexes(i, j, size)
-            dst[i][j] = (src[i][j] + dst[blend_i][blend_j]) // 2
+            dst[i][j] = (src[i][j] + src[blend_i][blend_j]) // 2
 
 def random_blending(size: int, iterations: int) -> List[List[int]]:
     if iterations <= 0:
